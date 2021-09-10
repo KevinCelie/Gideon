@@ -1,7 +1,7 @@
 import { Client, Intents } from "discord.js";
-import createCommand from "../utils/createCommand";
+import createCommand from "./createCommand.js";
 
-import convertTimeString from "../utils/convertTimeString";
+import convertTimeString from "./convertTimeString";
 
 const client = new Client({
   intents: [
@@ -16,35 +16,56 @@ client.on("ready", function () {
   console.log("Je suis connecté !");
 });
 
-let parentId;
-let timeoutSeconds = 5;
+let color = "YELLOW";
+let channelRequest = "admin";
 
 // add
 // del
 // request
 // def-main
 // def-sub
-//
+// def-color ?
 
 createCommand(client, "roles add", (message) => {
   if (!message.content) {
-    timeoutSeconds = 0;
-    message.channel.send(
-      `Les salons vocaux ne seront plus fermés automatiquement`
-    );
+    message.channel.send(`Aucun nom n'a été donné pour le rôle.`);
   } else {
-    try {
-      timeoutSeconds = convertTimeString(message.content);
-      message.channel.send(
-        `Les salons vocaux seront désormais fermés au bout de ${message.content}`
+    if (
+      message.guild.roles.cache.find((role) => role.name === message.content)
+    ) {
+      message.channel.send(`Le nom de rôle spécifié existe déjà.`);
+    } else {
+      // Create a new role
+      message.guild.roles.create({
+        name: message.content,
+        color: color,
+        mentionable: true,
+        reason: "",
+      });
+    }
+  }
+});
+
+createCommand(client, "roles del", (message) => {
+  let role = message.guild.roles.cache.find(
+    (role) => role.name === message.content
+  );
+  if (role) {
+    role.delete();
+  }
+});
+
+createCommand(client, "roles request", (message) => {
+  if (!message.content) {
+    message.channel.send(`Aucun nom n'a été donné pour le rôle.`);
+  } else {
+    let channel = message.guild.channels.cache.find(
+      (channel) => channel.name === channelRequest
+    );
+    if (channel) {
+      channel.send(
+        `${message.author} propose d'ajouter le role ${message.content}`
       );
-    } catch (error) {
-      console.error(error);
-      if (error.message === "Invalid format") {
-        message.channel.send(
-          `Le format est invalide, le format doit être .d.h.m.s avec (jour/heure/minute/seconde)`
-        );
-      }
     }
   }
 });
