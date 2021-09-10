@@ -12,7 +12,5 @@ export default function convertTimeString(timeString) {
   if (hString) h += Number(hString.replace("h", "")) || !!hString;
   if (mString) m += Number(mString.replace("m", "")) || !!mString;
   if (sString) s += Number(sString.replace("s", "")) || !!sString;
-  return (
-    24 * 60 * 60 * 1000 * d + 60 * 60 * 1000 * h + 60 * 1000 * m + 1000 * s
-  );
+  return 24 * 60 * 60 * d + 60 * 60 * h + 60 * m + s;
 }

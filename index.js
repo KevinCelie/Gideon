@@ -16,18 +16,19 @@ client.on("ready", function () {
 });
 
 let parentId;
+let timeoutSeconds = 5;
 
 createCommand(client, "voc-timeout", (message) => {
   if (!message) {
-    parentId = null;
+    timeoutSeconds = 0;
     message.channel.send(
       `Les salons vocaux ne seront plus fermé automatiquement`
     );
   }
   if (channel) {
-    parentId = channel.id;
+    timeoutSeconds = convertTimeString(message);
     message.channel.send(
-      `Les salons vocaux seront désormais fermé au bout de `
+      `Les salons vocaux seront désormais fermé au bout de ${message} soit ${timeoutSeconds} seconds`
     );
   } else message.channel.send(`Aucune catégorie ne correspond à ce nom`);
 });
@@ -57,9 +58,10 @@ createCommand(client, "voc", (message) => {
     .then((channel) => {
       let timeout;
       function checkPresence() {
-        timeout = setTimeout(() => {
-          channel.delete();
-        }, 5 * 60 * 1000);
+        if (timeoutSeconds)
+          timeout = setTimeout(() => {
+            channel.delete();
+          }, timeoutSeconds * 1000);
       }
       checkPresence();
       client.on("voiceStateUpdate", () => {
@@ -69,6 +71,4 @@ createCommand(client, "voc", (message) => {
     });
 });
 
-client.login("ODg1NTU3OTY2NjIxNzgyMDk2.YToyIA.oabhRm9sDjWx_IcWQFOIc8EY58M");
-
-console.log(convertTimeString("5h2s"));
+client.login(process.env.TOKEN);
