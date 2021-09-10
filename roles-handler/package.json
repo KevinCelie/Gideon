@@ -1,15 +1,16 @@
 {
   "scripts": {
-    "dev": "nodemon --exec babel-node --presets=@babel/preset-env -r dotenv/config ."
+    "dev": "babel-node --presets=@babel/preset-env -r dotenv/config . dotenv_config_path=../.dev.env",
+    "dev-auto": "nodemon --exec npm run dev"
   },
   "dependencies": {
-    "@babel/preset-env": "^7.15.4",
     "discord.js": "^13.1.0",
     "dotenv": "^10.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.15.5",
     "@babel/node": "^7.15.4",
+    "@babel/preset-env": "^7.15.6",
     "nodemon": "^2.0.12"
   }
 }

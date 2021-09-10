@@ -1,7 +1,7 @@
 import { Client, Intents } from "discord.js";
-import createCommand from "./createCommand";
+import createCommand from "../utils/createCommand";
 
-import convertTimeString from "./convertTimeString";
+import convertTimeString from "../utils/convertTimeString";
 
 const client = new Client({
   intents: [
