@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "nodemon --exec babel-node -r dotenv/config --presets=@babel/preset-env ."
+    "dev": "nodemon --exec babel-node --presets=@babel/preset-env -r dotenv/config ."
   },
   "dependencies": {
     "@babel/preset-env": "^7.15.4",

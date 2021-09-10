@@ -52,22 +52,28 @@ createCommand(client, "voc-category", (message) => {
 });
 
 createCommand(client, "voc", (message) => {
-  console.log(parentId);
   message.guild.channels
     .create(message.content, { parent: parentId, type: "GUILD_VOICE" })
     .then((channel) => {
       let timeout;
       function checkPresence() {
-        if (timeoutSeconds)
+        if (timeoutSeconds) {
+          if (timeout) {
+            clearTimeout(timeout);
+          }
           timeout = setTimeout(() => {
-            channel.delete();
+            if (channel && !channel.members.size) {
+              channel.delete();
+              client.off("voiceStateUpdate", callback);
+            }
           }, timeoutSeconds * 1000);
+        }
       }
       checkPresence();
-      client.on("voiceStateUpdate", () => {
-        if (!channel.members.size) checkPresence();
-        else if (timeout) clearTimeout(timeout);
-      });
+      const callback = () => {
+        if (channel && !channel.members.size) checkPresence();
+      };
+      client.on("voiceStateUpdate", callback);
     });
 });
 

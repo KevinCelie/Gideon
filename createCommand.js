@@ -1,4 +1,4 @@
-const prefix = "$";
+const prefix = "!";
 
 export default function createCommand(client, aliases, callback) {
   if (typeof aliases === "string") aliases = [aliases];
