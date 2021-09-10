@@ -8,9 +8,9 @@ export default function convertTimeString(timeString) {
   let h = 0;
   let m = 0;
   let s = 0;
-  if (dString) d += Number(dString.replace("d", "")) || !!dString;
-  if (hString) h += Number(hString.replace("h", "")) || !!hString;
-  if (mString) m += Number(mString.replace("m", "")) || !!mString;
-  if (sString) s += Number(sString.replace("s", "")) || !!sString;
+  d = dString ? (d += Number(dString.replace("d", "")) || 1) : 0;
+  h = hString ? (h += Number(hString.replace("h", "")) || 1) : 0;
+  m = mString ? (m += Number(mString.replace("m", "")) || 1) : 0;
+  s = sString ? (s += Number(sString.replace("s", "")) || 1) : 0;
   return 24 * 60 * 60 * d + 60 * 60 * h + 60 * m + s;
 }

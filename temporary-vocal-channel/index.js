@@ -1,8 +1,9 @@
 import { Client, Intents } from "discord.js";
-import createCommand from "./createCommand";
+import { createClient } from "redis";
+import convertTimeString from "../utils/convertTimeString";
+import createCommand from "../utils/createCommand";
 
-import convertTimeString from "./convertTimeString";
-
+const redisClient = createClient();
 const client = new Client({
   intents: [
     Intents.FLAGS.GUILDS,
@@ -14,9 +15,6 @@ const client = new Client({
 client.on("ready", function () {
   console.log("Je suis connecté !");
 });
-
-let parentId;
-let timeoutSeconds = 5;
 
 createCommand(client, "voc-timeout", (message) => {
   if (!message.content) {
@@ -91,4 +89,10 @@ createCommand(client, "voc", (message) => {
   }
 });
 
-client.login(process.env.TOKEN);
+(async () => {
+  redisClient.on("error", (err) => {
+    throw new Error("Redis Client Error", err);
+  });
+  await redisClient.connect();
+  client.login(process.env.TOKEN);
+})();
