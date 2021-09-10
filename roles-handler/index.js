@@ -7,6 +7,7 @@ const client = new Client({
   intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+    Intents.FLAGS.GUILD_MEMBERS,
     Intents.FLAGS.GUILD_MESSAGES,
   ],
 });
@@ -25,7 +26,7 @@ let timeoutSeconds = 5;
 // def-sub
 //
 
-createCommand(client, "roles-", (message) => {
+createCommand(client, "roles add", (message) => {
   if (!message.content) {
     timeoutSeconds = 0;
     message.channel.send(
