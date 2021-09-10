@@ -19,62 +19,76 @@ let parentId;
 let timeoutSeconds = 5;
 
 createCommand(client, "voc-timeout", (message) => {
-  if (!message) {
+  if (!message.content) {
     timeoutSeconds = 0;
     message.channel.send(
-      `Les salons vocaux ne seront plus fermé automatiquement`
+      `Les salons vocaux ne seront plus fermés automatiquement`
     );
+  } else {
+    try {
+      timeoutSeconds = convertTimeString(message.content);
+      message.channel.send(
+        `Les salons vocaux seront désormais fermés au bout de ${message.content}`
+      );
+    } catch (error) {
+      console.error(error);
+      if (error.message === "Invalid format") {
+        message.channel.send(
+          `Le format est invalide, le format doit être .d.h.m.s avec (jour/heure/minute/seconde)`
+        );
+      }
+    }
   }
-  if (channel) {
-    timeoutSeconds = convertTimeString(message);
-    message.channel.send(
-      `Les salons vocaux seront désormais fermé au bout de ${message} soit ${timeoutSeconds} seconds`
-    );
-  } else message.channel.send(`Aucune catégorie ne correspond à ce nom`);
 });
 
 createCommand(client, "voc-category", (message) => {
-  if (!message) {
+  if (!message.content) {
     parentId = null;
     message.channel.send(`Les salons vocaux seront générés sans catégorie`);
-  }
-  const channel = message.guild.channels.cache.find(
-    (channel) =>
-      channel.type === "GUILD_CATEGORY" &&
-      channel.name.toLowerCase().trim() === message.content.toLowerCase().trim()
-  );
-  if (channel) {
-    parentId = channel.id;
-    message.channel.send(
-      `Les salons vocaux seront désormais générés dans ${channel.name}`
+  } else {
+    const channel = message.guild.channels.cache.find(
+      (channel) =>
+        channel.type === "GUILD_CATEGORY" &&
+        channel.name.toLowerCase().trim() ===
+          message.content.toLowerCase().trim()
     );
-  } else message.channel.send(`Aucune catégorie ne correspond à ce nom`);
+    if (channel) {
+      parentId = channel.id;
+      message.channel.send(
+        `Les salons vocaux seront désormais générés dans ${channel.name}`
+      );
+    } else {
+      message.channel.send(`Aucune catégorie ne correspond à ce nom`);
+    }
+  }
 });
 
 createCommand(client, "voc", (message) => {
-  message.guild.channels
-    .create(message.content, { parent: parentId, type: "GUILD_VOICE" })
-    .then((channel) => {
-      let timeout;
-      function checkPresence() {
-        if (timeoutSeconds) {
-          if (timeout) {
-            clearTimeout(timeout);
-          }
-          timeout = setTimeout(() => {
-            if (channel && !channel.members.size) {
-              channel.delete();
-              client.off("voiceStateUpdate", callback);
+  if (message.content) {
+    message.guild.channels
+      .create(message.content, { parent: parentId, type: "GUILD_VOICE" })
+      .then((channel) => {
+        let timeout;
+        function checkPresence() {
+          if (timeoutSeconds) {
+            if (timeout) {
+              clearTimeout(timeout);
             }
-          }, timeoutSeconds * 1000);
+            timeout = setTimeout(() => {
+              if (channel && !channel.members.size) {
+                channel.delete();
+                client.off("voiceStateUpdate", callback);
+              }
+            }, timeoutSeconds * 1000);
+          }
         }
-      }
-      checkPresence();
-      const callback = () => {
-        if (channel && !channel.members.size) checkPresence();
-      };
-      client.on("voiceStateUpdate", callback);
-    });
+        checkPresence();
+        const callback = () => {
+          if (channel && !channel.members.size) checkPresence();
+        };
+        client.on("voiceStateUpdate", callback);
+      });
+  }
 });
 
 client.login(process.env.TOKEN);
