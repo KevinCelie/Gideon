@@ -4,6 +4,7 @@
     "dev-auto": "nodemon --exec npm run dev"
   },
   "dependencies": {
+    "better-sqlite3": "^7.4.3",
     "discord.js": "^13.1.0",
     "dotenv": "^10.0.0"
   },
